@@ -1,7 +1,7 @@
 /* global $, Stripe */
 //Document ready.
 $(document).on('turbolinks:load', function(){
-  var theForm = $('#pro-form');
+  var theForm = $('#pro_form');
   var signupBtn = $('#form-signup-btn');
   
   //Set Stripe public key.
@@ -28,19 +28,19 @@ $(document).on('turbolinks:load', function(){
       alert('The credit card number appears to be invalid');
     }
     //Validate CVC number
-    if (!Stripe.card.validateCardCVC(cvcNum)) {
+    if (!Stripe.card.validateCVC(cvcNum)) {
       error = true;
       alert('The CVC number appears to be invalid');
     }
     //Validate expiration date
-    if (!Stripe.card.validateCardExpiry(expMonth, expYear)) {
+    if (!Stripe.card.validateExpiry(expMonth, expYear)) {
       error = true;
       alert('The expiration date appears to be invalid');
     }
 
     if (error) {
-      signupBtn.val("Sign up").prop('disabled', false);
       //If there are card errors, then don't send to Stripe
+      signupBtn.val("Sign up").prop('disabled', false);
     } else {
       //Send card info to Stripe.
       Stripe.createToken({
@@ -56,14 +56,12 @@ $(document).on('turbolinks:load', function(){
   
   //Stripe will return card token.
   function stripeResponseHandler(status, response) {
-    // Get the token from the response
+    //Get the token from the response.
     var token = response.id;
-    
-    //Inject card token in the hidden field.
-    theForm.append( $('<input type="hidden"> name= "user[stripe_card_token]"').val(token) );
-    
+    //Inject the card token in a hidden field.
+    theForm.append( $('<input type="hidden" name="user[stripe_card_token]">').val(token) );
+    //Submit form to our Rails app.
+    theForm.get(0).submit();
   }
   
-  //Send form to our Rails app.
-  theForm.get(0).submit();
 });
